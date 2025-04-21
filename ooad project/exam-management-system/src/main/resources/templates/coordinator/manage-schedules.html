@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Manage Exam Schedules</title>
+    <th:block th:insert="~{layouts/base :: commonHeadElements}"></th:block>
+    <style>
+        .dashboard-card {
+            transition: transform 0.2s;
+            margin-bottom: 20px;
+        }
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <div th:insert="~{layouts/base :: navbar}"></div>
+
+    <div class="content">
+        <div class="container mt-4">
+            <div class="header">
+                <h2>Manage Exam Schedules</h2>
+                <a th:href="@{/dashboard}" class="btn btn-secondary">Back to Dashboard</a>
+            </div>
+
+            <!-- Flash Messages -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    <form th:action="@{/coordinator/schedules/update}" method="post" id="updateScheduleForm">
+                        <div class="form-group mb-3">
+                            <label for="newStartTime" class="form-label">New Start Time:</label>
+                            <input type="datetime-local" id="newStartTime" name="newStartTime" class="form-control" required>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Select</th>
+                                        <th>Student Name</th>
+                                        <th>Student ID</th>
+                                        <th>Exam Subject</th>
+                                        <th>Current Schedule</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="registration : ${registrations}">
+                                        <td>
+                                            <input type="checkbox" name="selectedRegistrations" 
+                                                   th:value="${registration.id}" class="form-check-input registration-checkbox">
+                                        </td>
+                                        <td th:text="${registration.student.name}"></td>
+                                        <td th:text="${registration.student.studentId}"></td>
+                                        <td th:text="${registration.exam.subject}"></td>
+                                        <td>
+                                            <span th:text="${#temporals.format(registration.schedule?.startTime, 'dd MMM yyyy, hh:mm a')}"></span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <input type="hidden" name="registrationIds" id="registrationIds">
+                        <button type="submit" class="btn btn-primary" id="updateButton" disabled>
+                            <i class="fas fa-save me-2"></i>Update Selected Schedules
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:insert="~{layouts/base :: footer}"></div>
+
+    <th:block th:insert="~{layouts/base :: commonScripts}"></th:block>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkboxes = document.querySelectorAll('.registration-checkbox');
+            const updateButton = document.getElementById('updateButton');
+            const registrationIdsInput = document.getElementById('registrationIds');
+
+            function updateSelectedRegistrations() {
+                const selectedIds = Array.from(checkboxes)
+                    .filter(checkbox => checkbox.checked)
+                    .map(checkbox => checkbox.value);
+                
+                registrationIdsInput.value = selectedIds.join(',');
+                updateButton.disabled = selectedIds.length === 0;
+            }
+
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateSelectedRegistrations);
+            });
+        });
+    </script>
+</body>
+</html> 

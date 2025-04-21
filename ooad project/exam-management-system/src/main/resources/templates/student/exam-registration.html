@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:replace="~{layouts/base :: pageTitle}">Exam Registration</title>
+    <th:block th:insert="~{layouts/base :: commonHeadElements}"></th:block>
+    <style>
+        .exam-card {
+            transition: transform 0.2s;
+            margin-bottom: 20px;
+            cursor: pointer;
+            position: relative;
+        }
+        .exam-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .exam-card.selected {
+            border: 2px solid #0d6efd;
+            background-color: #f8f9fa;
+        }
+        .card-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #0d6efd;
+        }
+        .exam-details {
+            margin-top: 1rem;
+        }
+        .exam-details p {
+            margin-bottom: 0.5rem;
+            color: #6c757d;
+        }
+        .action-buttons {
+            margin-top: 2rem;
+            text-align: center;
+        }
+        .no-exams {
+            text-align: center;
+            padding: 3rem;
+            background: #f8f9fa;
+            border-radius: 0.5rem;
+            margin-top: 2rem;
+        }
+        .exam-card .card-body {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+        }
+        .action-area {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+        }
+        .registered-text {
+            color: #6c757d; 
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div th:insert="~{layouts/base :: navbar}"></div>
+
+    <div class="content">
+        <div class="container mt-4">
+            <div class="header">
+                <h2>Register for Exam</h2>
+                <a th:href="@{/student/dashboard}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                </a>
+            </div>
+
+            <!-- Flash Messages -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <!-- No Exams Message -->
+            <div th:if="${#lists.isEmpty(availableExams)}" class="no-exams">
+                <i class="fas fa-info-circle fa-3x text-muted mb-3"></i>
+                <h4>No Online Exams Available</h4>
+                <p class="text-muted">There are currently no online exams available for registration.</p>
+            </div>
+
+            <!-- Exam List -->
+            <div th:if="${not #lists.isEmpty(availableExams)}" class="row">
+                <div th:each="exam : ${availableExams}" class="col-md-6 col-lg-4 mb-4">
+                    <div class="card exam-card h-100">
+                        <div class="card-body text-center">
+                            <div>
+                                <i class="fas fa-file-alt card-icon"></i>
+                                <h5 class="card-title" th:text="${exam.subject}">Subject Name</h5>
+                                <div class="exam-details">
+                                    <p><i class="fas fa-clock me-2"></i>Duration: <span th:text="${exam.duration + ' minutes'}">120 minutes</span></p>
+                                    <p><i class="fas fa-star me-2"></i>Total Marks: <span th:text="${exam.totalMarks}">100</span></p>
+                                    <p><i class="fas fa-question-circle me-2"></i>Questions: <span th:text="${exam.totalQuestions}">50</span></p>
+                                </div>
+                            </div>
+
+                            <div class="action-area mt-auto">
+                                <th:block th:with="isRegistered=${@examServiceImpl.isStudentRegistered(exam, currentStudent)}">
+                                    <th:block th:if="${not isRegistered}">
+                                        <form th:action="@{/student/exam/register}" method="post" class="d-inline">
+                                            <input type="hidden" name="examId" th:value="${exam.id}" />
+                                            <button type="submit" class="btn btn-primary w-100">
+                                                <i class="fas fa-check-circle me-2"></i>Register
+                                            </button>
+                                        </form>
+                                    </th:block>
+                                    <th:block th:if="${isRegistered}">
+                                        <p class="registered-text"><i class="fas fa-check me-2"></i>Already Registered</p>
+                                    </th:block>
+                                </th:block>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:insert="~{layouts/base :: footer}"></div>
+
+    <th:block th:insert="~{layouts/base :: commonScripts}"></th:block>
+</body>
+</html> 

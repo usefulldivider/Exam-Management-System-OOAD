@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:replace="~{layouts/base :: pageTitle}">Proofread Exam</title>
+    <th:block th:insert="~{layouts/base :: commonHeadElements}"></th:block>
+    <style>
+        .question-card {
+            margin-bottom: 2rem;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            background-color: #fff; /* Ensure background for shadow */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .question-header {
+            background-color: #e9ecef; /* Slightly different header color */
+            padding: 1rem;
+            border-bottom: 1px solid #dee2e6;
+            font-weight: bold;
+        }
+        .option-group { margin-bottom: 1rem; }
+        .option-input {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        .option-input input[type="radio"] { margin-right: 1rem; }
+        .form-label { font-weight: 500; }
+    </style>
+</head>
+<body>
+    <div th:insert="~{layouts/base :: navbar}"></div>
+
+    <div class="content">
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-md-10 offset-md-1"> <!-- Wider column -->
+                    <div class="card mb-4">
+                         <div class="card-header bg-warning text-dark"> <!-- Warning header -->
+                            <h4 class="mb-0">Proofread Exam</h4>
+                        </div>
+                        <div class="card-body">
+                             <div class="mb-3">
+                                <h5>Subject: <span th:text="${exam.subject}">Subject</span></h5>
+                                <h5>Duration: <span th:text="${exam.duration}">Duration</span> minutes</h5>
+                                <h5>Total Questions: <span th:text="${exam.totalQuestions}">Total Questions</span></h5>
+                                <h5>Created By: <span th:text="${exam.creator?.name}">Creator</span></h5>
+                            </div>
+                            <hr>
+                            <p>Review the questions below. You can modify the text, options, and correct answer. Click 'Submit Proofread Changes' when done.</p>
+
+                            <!-- Form to submit proofread changes -->
+                            <!-- IMPORTANT: Binding list data needs careful handling -->
+                            <!-- Option 1: Use indexed names (requires controller parsing) -->
+                            <!-- Option 2: Use Thymeleaf's th:field with DTO list (more robust, but requires DTO) -->
+                            <!-- Using Option 1 for simplicity here -->
+                            <form th:action="@{/teacher/exams/{examId}/process-proofread(examId=${exam.id})}" method="post">
+                                <input type="hidden" name="examId" th:value="${exam.id}">
+
+                                <!-- Iterate through existing questions -->
+                                <div th:each="question, iterStat : ${exam.questions}" class="question-card">
+                                    <div class="question-header">
+                                        Question <span th:text="${iterStat.count}">1</span>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- Hidden field for original question ID (useful for matching on backend) -->
+                                        <input type="hidden" th:name="'questions[' + ${iterStat.index} + '].id'" th:value="${question.id}">
+
+                                        <div class="mb-3">
+                                            <label th:for="'questionText' + ${iterStat.index}" class="form-label">Question Text</label>
+                                            <textarea class="form-control" th:id="'questionText' + ${iterStat.index}"
+                                                      th:name="'questions[' + ${iterStat.index} + '].questionText'" rows="3"
+                                                      th:text="${question.questionText}" required></textarea>
+                                        </div>
+
+                                        <div class="option-group">
+                                            <label class="form-label">Options & Correct Answer</label>
+                                            <div class="option-input">
+                                                <input type="radio" th:name="'questions[' + ${iterStat.index} + '].correctAnswer'" value="A"
+                                                       th:checked="${question.correctAnswer == T(com.exam.exam_management_system.models.enums.MCQOption).A}" required>
+                                                <input type="text" class="form-control" th:name="'questions[' + ${iterStat.index} + '].optionA'"
+                                                       th:value="${question.optionA}" placeholder="Option A" required>
+                                            </div>
+                                            <div class="option-input">
+                                                <input type="radio" th:name="'questions[' + ${iterStat.index} + '].correctAnswer'" value="B"
+                                                       th:checked="${question.correctAnswer == T(com.exam.exam_management_system.models.enums.MCQOption).B}" required>
+                                                <input type="text" class="form-control" th:name="'questions[' + ${iterStat.index} + '].optionB'"
+                                                       th:value="${question.optionB}" placeholder="Option B" required>
+                                            </div>
+                                            <div class="option-input">
+                                                <input type="radio" th:name="'questions[' + ${iterStat.index} + '].correctAnswer'" value="C"
+                                                       th:checked="${question.correctAnswer == T(com.exam.exam_management_system.models.enums.MCQOption).C}" required>
+                                                <input type="text" class="form-control" th:name="'questions[' + ${iterStat.index} + '].optionC'"
+                                                       th:value="${question.optionC}" placeholder="Option C" required>
+                                            </div>
+                                            <div class="option-input">
+                                                <input type="radio" th:name="'questions[' + ${iterStat.index} + '].correctAnswer'" value="D"
+                                                       th:checked="${question.correctAnswer == T(com.exam.exam_management_system.models.enums.MCQOption).D}" required>
+                                                <input type="text" class="form-control" th:name="'questions[' + ${iterStat.index} + '].optionD'"
+                                                       th:value="${question.optionD}" placeholder="Option D" required>
+                                            </div>
+                                        </div>
+                                         <!-- Marks are fixed at 1 -->
+                                         <input type="hidden" th:name="'questions[' + ${iterStat.index} + '].marks'" value="1">
+                                    </div>
+                                </div>
+
+                                <div class="d-grid gap-2 mt-4">
+                                    <button type="submit" class="btn btn-success">Submit Proofread Changes</button>
+                                    <a th:href="@{/teacher/exams/pending-proofread}" class="btn btn-secondary">Cancel</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:insert="~{layouts/base :: footer}"></div>
+    <th:block th:insert="~{layouts/base :: commonScripts}"></th:block>
+</body>
+</html>

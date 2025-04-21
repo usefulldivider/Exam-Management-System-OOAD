@@ -1,0 +1,11 @@
+package com.exam.exam_management_system.models.states;
+import com.exam.exam_management_system.models.ExamStateHandler;
+import com.exam.exam_management_system.models.enums.ExamState;
+import com.exam.exam_management_system.models.Exam;
+
+public class CompletedState implements ExamStateHandler {
+    @Override
+    public void next(Exam exam) {
+        exam.setState(ExamState.EVALUATED);
+    }
+}

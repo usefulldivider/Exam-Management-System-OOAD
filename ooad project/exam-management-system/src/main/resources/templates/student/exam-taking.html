@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Take Exam</title>
+    <th:block th:insert="~{layouts/base :: commonHeadElements}"></th:block>
+    <style>
+        .timer {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #f8f9fa;
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .question-container {
+            margin: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .options {
+            margin: 15px 0;
+        }
+        .option {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .option:hover {
+            background: #f8f9fa;
+        }
+        .option.selected {
+            background: #e9ecef;
+            border-color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div th:insert="~{layouts/base :: navbar}"></div>
+
+    <div class="container mt-4">
+        <div class="timer">
+            <h4>Time Remaining: <span id="timer">00:00</span></h4>
+        </div>
+
+        <div class="question-container">
+            <h3 th:text="${exam.subject}">Exam Subject</h3>
+            <div class="progress mb-3">
+                <div class="progress-bar" role="progressbar" th:style="'width: ' + ${currentQuestionIndex + 1} + '00%'"></div>
+            </div>
+
+            <form th:action="@{/student/exam-taking/{examId}/submit(examId=${exam.id})}" method="post">
+                <div class="question" th:each="question, stat : ${exam.questions}">
+                    <h4 th:text="${stat.count + '. ' + question.questionText}">Question Text</h4>
+                    <div class="options">
+                        <!-- Option A -->
+                        <div class="option">
+                            <input type="radio" th:name="'answer_' + ${question.id}" th:value="${T(com.exam.exam_management_system.models.enums.MCQOption).A}" th:id="${'option_' + question.id + '_A'}">
+                            <label th:for="${'option_' + question.id + '_A'}" th:text="'A. ' + ${question.optionA}">Option A Text</label>
+                        </div>
+                        <!-- Option B -->
+                        <div class="option">
+                            <input type="radio" th:name="'answer_' + ${question.id}" th:value="${T(com.exam.exam_management_system.models.enums.MCQOption).B}" th:id="${'option_' + question.id + '_B'}">
+                            <label th:for="${'option_' + question.id + '_B'}" th:text="'B. ' + ${question.optionB}">Option B Text</label>
+                        </div>
+                        <!-- Option C -->
+                        <div class="option">
+                            <input type="radio" th:name="'answer_' + ${question.id}" th:value="${T(com.exam.exam_management_system.models.enums.MCQOption).C}" th:id="${'option_' + question.id + '_C'}">
+                            <label th:for="${'option_' + question.id + '_C'}" th:text="'C. ' + ${question.optionC}">Option C Text</label>
+                        </div>
+                        <!-- Option D -->
+                        <div class="option">
+                            <input type="radio" th:name="'answer_' + ${question.id}" th:value="${T(com.exam.exam_management_system.models.enums.MCQOption).D}" th:id="${'option_' + question.id + '_D'}">
+                            <label th:for="${'option_' + question.id + '_D'}" th:text="'D. ' + ${question.optionD}">Option D Text</label>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit Exam</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Timer functionality
+        function startTimer(duration) {
+            let timer = duration, minutes, seconds;
+            const display = document.querySelector('#timer');
+            
+            const interval = setInterval(function () {
+                minutes = parseInt(timer / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                display.textContent = minutes + ":" + seconds;
+
+                if (--timer < 0) {
+                    clearInterval(interval);
+                    document.querySelector('form').submit();
+                }
+            }, 1000);
+        }
+
+        // Start timer with exam duration in minutes
+        startTimer([[${exam.duration}]] * 60);
+
+        // Option selection
+        document.querySelectorAll('.option').forEach(option => {
+            option.addEventListener('click', function() {
+                const radio = this.querySelector('input[type="radio"]');
+                radio.checked = true;
+                this.parentElement.querySelectorAll('.option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                this.classList.add('selected');
+            });
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:replace="~{layouts/base :: pageTitle}">Teacher Dashboard</title>
+    <th:block th:insert="~{layouts/base :: commonHeadElements}"></th:block>
+    <style>
+        .dashboard-card {
+            transition: transform 0.2s;
+            margin-bottom: 20px;
+        }
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #0d6efd;
+        }
+        .card-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+        .card-text {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        .coming-soon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #ffc107;
+            color: #000;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+        .badge-notification {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            padding: 5px 8px;
+            border-radius: 50%;
+            background: red;
+            color: white;
+            font-size: 0.75rem;
+        }
+        .position-relative {
+            position: relative;
+        }
+        .draft-exam-section {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #dee2e6;
+        }
+        .draft-exam-section h4 {
+            margin-bottom: 1rem;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <div th:insert="~{layouts/base :: navbar}"></div>
+
+    <div class="content">
+        <div class="container mt-4">
+            <div class="header">
+                <h2>Teacher Dashboard</h2>
+                <a th:href="@{/logout}" class="btn btn-secondary">Logout</a>
+            </div>
+            
+            <!-- Flash Messages -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            
+            <div class="row">
+                <!-- Create Exam Paper Card -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="card dashboard-card h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-file-alt card-icon"></i>
+                            <h5 class="card-title">Create Exam Paper</h5>
+                            <p class="card-text">Create and manage exam papers for your courses</p>
+                            <a th:href="@{/teacher/exam-papers/create}" class="btn btn-primary">Create Paper</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- View/Proofread Pending Exams Card -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="card dashboard-card h-100 position-relative">
+                        <!-- Notification Badge -->
+                        <span th:if="${pendingProofreadCount > 0}" class="badge-notification" th:text="${pendingProofreadCount}"></span>
+                        <div class="card-body text-center">
+                            <i class="fas fa-tasks card-icon"></i>
+                            <h5 class="card-title">Proofread Pending</h5>
+                            <p class="card-text">Review exams submitted by other teachers.</p>
+                            <a th:href="@{/teacher/exams/pending-proofread}" class="btn btn-warning">View Pending</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- My Draft Exams Section -->
+            <div class="draft-exam-section">
+                <h4>My Draft Exams</h4>
+                <div th:if="${#lists.isEmpty(myDraftExams)}" class="alert alert-secondary" role="alert">
+                    You have no draft exams currently.
+                </div>
+                <div th:if="${not #lists.isEmpty(myDraftExams)}">
+                    <table class="table table-sm table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Duration</th>
+                                <th>Questions</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="draft : ${myDraftExams}">
+                                <td th:text="${draft.subject}">Draft Subject</td>
+                                <td th:text="${draft.duration}">0</td>
+                                <td th:text="${draft.totalQuestions}">0</td>
+                                <td>
+                                    <!-- TODO: Add Edit Draft link here? -->
+                                    <!-- Submit for Proofread Button -->
+                                    <form th:action="@{/teacher/exams/{examId}/submit-proofread(examId=${draft.id})}" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-info">
+                                            <i class="fas fa-paper-plane"></i> Submit for Proofread
+                                        </button>
+                                    </form>
+                                    <!-- TODO: Add Delete Draft button here? -->
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:insert="~{layouts/base :: footer}"></div>
+
+    <th:block th:insert="~{layouts/base :: commonScripts}"></th:block>
+</body>
+</html> 

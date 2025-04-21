@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:replace="~{layouts/base :: pageTitle}">Create Exam - Basic Details</title>
+    <th:block th:insert="~{layouts/base :: commonHeadElements}"></th:block>
+    <style>
+        .exam-form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .form-card {
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div th:insert="~{layouts/base :: navbar}"></div>
+
+    <div class="content">
+        <div class="container mt-4">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card form-card">
+                        <div class="card-header bg-primary text-white">
+                            <h4 class="mb-0">Create New Exam - Basic Details</h4>
+                        </div>
+                        <div class="card-body">
+                            <form th:action="@{/teacher/exams/create/details}" method="post" class="exam-form">
+                                <div class="mb-3">
+                                    <label for="subject" class="form-label">Subject</label>
+                                    <input type="text" class="form-control" id="subject" name="subject" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="duration" class="form-label">Duration (minutes)</label>
+                                    <input type="number" class="form-control" id="duration" name="duration" min="1" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="totalQuestions" class="form-label">Total Number of Questions</label>
+                                    <input type="number" class="form-control" id="totalQuestions" name="totalQuestions" min="1" required>
+                                    <small class="text-muted">Each question will be worth 1 mark</small>
+                                </div>
+
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-primary">Next: Add Questions</button>
+                                    <a th:href="@{/teacher/dashboard}" class="btn btn-secondary">Cancel</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:insert="~{layouts/base :: footer}"></div>
+    <th:block th:insert="~{layouts/base :: commonScripts}"></th:block>
+</body>
+</html> 

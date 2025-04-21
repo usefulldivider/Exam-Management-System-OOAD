@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:replace="~{layouts/base :: pageTitle}">Create Exam - Add Questions</title>
+    <th:block th:insert="~{layouts/base :: commonHeadElements}"></th:block>
+    <style>
+        .question-card {
+            margin-bottom: 2rem;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+        }
+        .question-header {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .option-group {
+            margin-bottom: 1rem;
+        }
+        .option-input {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        .option-input input[type="radio"] {
+            margin-right: 1rem;
+        }
+        .progress {
+            height: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div th:insert="~{layouts/base :: navbar}"></div>
+
+    <div class="content">
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h4 class="mb-0">Create Exam - Add Questions</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <h5>Subject: <span th:text="${exam.subject}">Subject</span></h5>
+                                <h5>Duration: <span th:text="${exam.duration}">Duration</span> minutes</h5>
+                                <h5>Total Questions: <span th:text="${exam.totalQuestions}">Total Questions</span></h5>
+                            </div>
+
+                            <div class="progress mb-4">
+                                <div class="progress-bar" role="progressbar" 
+                                     th:style="'width: ' + ${(currentQuestionIndex / exam.totalQuestions) * 100} + '%'"
+                                     th:text="${currentQuestionIndex} + '/' + ${exam.totalQuestions}">
+                                </div>
+                            </div>
+
+                            <form th:action="@{/teacher/exams/create/questions}" method="post">
+                                <input type="hidden" name="examId" th:value="${exam.id}">
+                                <input type="hidden" name="questionIndex" th:value="${currentQuestionIndex}">
+
+                                <div class="question-card">
+                                    <div class="question-header">
+                                        <h5>Question <span th:text="${currentQuestionIndex + 1}">1</span></h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label for="questionText" class="form-label">Question Text</label>
+                                            <textarea class="form-control" id="questionText" name="questionText" rows="3" required></textarea>
+                                        </div>
+
+                                        <div class="option-group">
+                                            <label class="form-label">Options</label>
+                                            <div class="option-input">
+                                                <input type="radio" name="correctOption" value="A" required>
+                                                <input type="text" class="form-control" name="optionA" placeholder="Option A" required>
+                                            </div>
+                                            <div class="option-input">
+                                                <input type="radio" name="correctOption" value="B" required>
+                                                <input type="text" class="form-control" name="optionB" placeholder="Option B" required>
+                                            </div>
+                                            <div class="option-input">
+                                                <input type="radio" name="correctOption" value="C" required>
+                                                <input type="text" class="form-control" name="optionC" placeholder="Option C" required>
+                                            </div>
+                                            <div class="option-input">
+                                                <input type="radio" name="correctOption" value="D" required>
+                                                <input type="text" class="form-control" name="optionD" placeholder="Option D" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-primary">
+                                        <span th:if="${currentQuestionIndex + 1 < exam.totalQuestions}">Next Question</span>
+                                        <span th:if="${currentQuestionIndex + 1 == exam.totalQuestions}">Submit Exam</span>
+                                    </button>
+                                    <a th:href="@{/teacher/dashboard}" class="btn btn-secondary">Cancel</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:insert="~{layouts/base :: footer}"></div>
+    <th:block th:insert="~{layouts/base :: commonScripts}"></th:block>
+</body>
+</html> 

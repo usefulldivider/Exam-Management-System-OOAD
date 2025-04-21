@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Stored Exam Papers</title>
+    <th:block th:insert="~{layouts/base :: commonHeadElements}"></th:block>
+    <style>
+        .dashboard-card {
+            transition: transform 0.2s;
+            margin-bottom: 20px;
+        }
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <div th:insert="~{layouts/base :: navbar}"></div>
+
+    <div class="content">
+        <div class="container mt-4">
+            <div class="header">
+                <h2>Stored Exam Papers</h2>
+                <a th:href="@{/coe/dashboard}" class="btn btn-secondary">Back to Dashboard</a>
+            </div>
+
+            <!-- Flash Messages -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    <div th:if="${#lists.isEmpty(storedPapers)}">
+                        <p class="text-center text-muted">No exam papers are currently stored.</p>
+                    </div>
+
+                    <div class="row" th:unless="${#lists.isEmpty(storedPapers)}">
+                        <div class="col-md-6 mb-4" th:each="paper : ${storedPapers}">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title" th:text="${paper.subject}">Subject</h5>
+                                    <div class="card-text">
+                                        <p><strong>Creator:</strong> <span th:text="${paper.creator.name}">Creator Name</span></p>
+                                        <p><strong>Proofreader:</strong> <span th:text="${paper.proofreader.name}">Proofreader Name</span></p>
+                                        <p><strong>Total Questions:</strong> <span th:text="${paper.totalQuestions}">0</span></p>
+                                        <p><strong>Total Marks:</strong> <span th:text="${paper.totalMarks}">0</span></p>
+                                        <p><strong>Duration:</strong> <span th:text="${paper.duration}">0</span> minutes</p>
+                                        <p><strong>Status:</strong> 
+                                            <span th:if="${paper.online}" class="badge bg-success">Online</span>
+                                            <span th:unless="${paper.online}" class="badge bg-warning">Offline</span>
+                                        </p>
+                                    </div>
+                                    <div class="mt-3">
+                                        <form th:if="${!paper.online}" th:action="@{/coe/papers/{id}/set-online(id=${paper.id})}" method="post" style="display: inline;">
+                                            <button type="submit" class="btn btn-primary">Set Online</button>
+                                        </form>
+                                        <form th:if="${paper.online}" th:action="@{/coe/papers/{id}/set-offline(id=${paper.id})}" method="post" style="display: inline;">
+                                            <button type="submit" class="btn btn-warning">Set Offline</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <a href="/coe/active-papers" class="btn btn-primary">View Active Online Exams</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:insert="~{layouts/base :: footer}"></div>
+    <th:block th:insert="~{layouts/base :: commonScripts}"></th:block>
+</body>
+</html> 

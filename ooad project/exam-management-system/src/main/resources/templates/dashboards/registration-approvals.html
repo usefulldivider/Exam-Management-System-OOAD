@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:replace="~{layouts/base :: pageTitle}">Registration Approvals</title>
+    <th:block th:insert="~{layouts/base :: commonHeadElements}"></th:block>
+</head>
+<body>
+    <div th:insert="~{layouts/base :: navbar}"></div>
+
+    <div class="content">
+        <div class="container mt-4">
+            <div class="header">
+                <h2>Registration Approvals</h2>
+                <a th:href="@{/dashboard}" class="btn btn-secondary">Back to Dashboard</a>
+            </div>
+            
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Pending Registrations</h4>
+                        </div>
+                        <div class="card-body">
+                            <div th:if="${#lists.isEmpty(pendingRegistrations)}" class="alert alert-info">
+                                No pending registrations to review.
+                            </div>
+                            
+                            <div th:unless="${#lists.isEmpty(pendingRegistrations)}" class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Username</th>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Role</th>
+                                            <th>Additional Info</th>
+                                            <th>Registration Date</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="user : ${pendingRegistrations}">
+                                            <td th:text="${user.username}">username</td>
+                                            <td th:text="${user.name}">name</td>
+                                            <td th:text="${user.email}">email</td>
+                                            <td th:text="${user.role}">role</td>
+                                            <td>
+                                                <span th:if="${user.role == T(com.exam.exam_management_system.models.enums.UserRole).STUDENT}" 
+                                                      th:text="${user.studentId}">studentId</span>
+                                                <span th:if="${user.role == T(com.exam.exam_management_system.models.enums.UserRole).TEACHER}" 
+                                                      th:text="${user.department}">department</span>
+                                            </td>
+                                            <td th:text="${#temporals.format(user.createdAt, 'dd/MM/yyyy HH:mm')}">date</td>
+                                            <td>
+                                                <form th:action="@{/coordinator/registrations/{id}/approve(id=${user.id})}" method="post" style="display: inline;">
+                                                    <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                                                </form>
+                                                <form th:action="@{/coordinator/registrations/{id}/reject(id=${user.id})}" method="post" style="display: inline;">
+                                                    <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:insert="~{layouts/base :: footer}"></div>
+
+    <th:block th:insert="~{layouts/base :: commonScripts}"></th:block>
+</body>
+</html> 

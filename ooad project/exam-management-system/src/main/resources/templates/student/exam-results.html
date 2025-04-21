@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Exam Results</title>
+    <th:block th:insert="~{layouts/base :: commonHeadElements}"></th:block>
+    <style>
+        .result-card {
+            margin: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .score {
+            font-size: 2em;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .status {
+            text-align: center;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .status.passed {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .question-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            background: #f8f9fa;
+        }
+        .question-result.correct {
+            border-left: 4px solid #28a745;
+        }
+        .question-result.incorrect {
+            border-left: 4px solid #dc3545;
+        }
+        .question-text {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .answer-details {
+            margin-left: 20px;
+            color: #6c757d;
+        }
+        .correct-answer {
+            color: #28a745;
+        }
+        .incorrect-answer {
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <nav th:insert="~{layouts/base :: navbar}"></nav>
+
+    <div class="container mt-4">
+        <div class="result-card">
+            <h2 th:text="${exam.subject}">Exam Subject</h2>
+            <div class="score">
+                <span th:text="${result.marksObtained}">0</span> / <span th:text="${exam.totalMarks}">0</span>
+            </div>
+            <div class="status" th:classappend="${result.status == 'PASSED' ? 'passed' : 'failed'}" 
+                 th:text="${result.status}">Status</div>
+            
+            <div class="mt-4">
+                <h4>Performance Summary</h4>
+                <p>You answered <span th:text="${result.marksObtained}">0</span> questions correctly out of 
+                   <span th:text="${exam.totalQuestions}">0</span> questions.</p>
+            </div>
+
+            <!-- Question-wise Results -->
+            <div class="mt-4">
+                <h4>Question Details</h4>
+                <div th:each="answer : ${answers}" class="question-result" 
+                     th:classappend="${answer.selectedOption == answer.question.correctAnswer ? 'correct' : 'incorrect'}">
+                    <div class="question-text" th:text="${answer.question.questionText}">Question Text</div>
+                    <div class="answer-details">
+                        <p>Your Answer: <span th:text="${answer.selectedOption}" 
+                           th:class="${answer.selectedOption == answer.question.correctAnswer ? 'correct-answer' : 'incorrect-answer'}">
+                           Selected Option</span></p>
+                        <p th:if="${answer.selectedOption != answer.question.correctAnswer}">
+                           Correct Answer: <span class="correct-answer" th:text="${answer.question.correctAnswer}">Correct Option</span>
+                        </p>
+                        <p>Marks: <span th:text="${answer.selectedOption == answer.question.correctAnswer ? answer.question.marks : 0}">0</span> / 
+                           <span th:text="${answer.question.marks}">Total Marks</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a th:href="@{/student/dashboard}" class="btn btn-primary">Back to Dashboard</a>
+                <a th:href="@{/student/all-exam-results}" class="btn btn-info">View All Results</a>
+            </div>
+        </div>
+    </div>
+
+    <th:block th:insert="~{layouts/base :: commonScripts}"></th:block>
+</body>
+</html> 
