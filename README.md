@@ -59,13 +59,6 @@ Run : ooad project/exam-management-system/src/main/java/com/exam/exam_management
 
 > Ensure each role performs the required actions in sequence to simulate the full exam lifecycle.
 
-
-Name | Module worked on
-Teacher | Vignesh Singaravelu
-Student | Vedanth Padmaraman
-Exam Coordinator | Vidwan K V
-Exam Controller | Vishnu Srinivas
-
 # Individual contribution
 | Name                  | Module worked on    |     
 |-----------------------|---------------------|
